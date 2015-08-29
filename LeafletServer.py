@@ -34,12 +34,15 @@ def ImageryRequest(tileStr):
     y = tile.ty
     
     downloadedTileList = os.listdir('DownloadedTiles/')
-    tileFileName = str(z)+'.'+str(y)+'.'+str(x)+'.png'
-
-    if tileFileName not in downloadedTileList:
+    tileFileName = str(z)+'.'+str(4*y)+'.'+str(4*x)+'.png'
+    
+    #if tileFileName not in downloadedTileList:
        #os.system('curl ' + 'http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/'+str(z)+'/'+str(x)+'/'+str(y)+'.png' + ' > '+'DownloadedTiles/'+tileFileName+' --silent')
-       os.system('curl ' + 'http://appmapdata.environment.nsw.gov.au/arcgiswa/rest/services/Soil/Soils_ASC_SoilTypes/MapServer/'+str(z)+'/'+str(x)+'/'+str(y)+'.png' + ' > '+'DownloadedTiles/'+tileFileName+' --silent')
-            
+    os.system('curl http://appmapdata.environment.nsw.gov.au/arcgiswa/rest/services/Soil_Landscape/Sydney/MapServer/tile/'+str(z)+'/'+str(4*y)+'/'+str(4*x)+' > '+'DownloadedTiles/'+tileFileName+' --silent')
+    
+    #z,x,y = 11,1228,1883
+    #os.system('curl http://appmapdata.environment.nsw.gov.au/arcgiswa/rest/services/Landuse/Landuse/MapServer/'+str(z)+'/'+str(y)+'/'+str(x)+' > out.png')
+
     #Open the image
     tileImage = Image.open('DownloadedTiles/'+tileFileName)
     #Turn the image into a string
@@ -48,7 +51,13 @@ def ImageryRequest(tileStr):
     buffer_image.seek(0)
     #Send the string
     return(send_file(buffer_image, mimetype='image/png'))
-    
+  
+#z,y,x = 12,9853,12524
+#os.system('curl http://appmapdata.environment.nsw.gov.au/arcgiswa/rest/services/Soil_Landscape/Sydney/MapServer/tile/'+str(z)+'/'+str(y)+'/'+str(x)+' > out.png')
+#os.system('curl http://appmapdata.environment.nsw.gov.au/arcgiswa/rest/services/Soil_Landscape/Sydney/MapServer/tile/12/9853/12524 > out.png')
+
+
+
 if __name__ == "__main__":
     print('Server has started')
     os.system('rm -r DownloadedTiles')

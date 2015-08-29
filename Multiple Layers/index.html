@@ -1,5 +1,3 @@
-
-
 <html>
     <head>
     <!--[if lte IE 8]>
@@ -7,102 +5,68 @@
     <![endif]-->
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-    
+    <script src="http://rawgithub.com/kartena/Proj4Leaflet/master/lib/proj4-compressed.js"></script>
+    <script src="http://rawgithub.com/kartena/Proj4Leaflet/master/src/proj4leaflet.js"></script>
     <style>
-    
-        body {
-			padding: 0;
-			margin: 0;
-		}
-		
-		#map {
-			height: 100%;
-		}
+        body    {
+                        padding: 0;
+                        margin: 0;
+                }
+                #map {
+                        height: 100%;
+                }
 
-		.info {
-			padding: 6px 8px;
-			font: 14px/16px Arial, Helvetica, sans-serif;
-			background: white;
-			background: rgba(255,255,255,0.8);
-			box-shadow: 0 0 15px rgba(0,0,0,0.2);
-			border-radius: 5px;
-		}
-		.info h4 {
-			margin: 0 0 5px;
-			color: #777;
-		}
+                .info {
+                        padding: 6px 8px;
+                        font: 14px/16px Arial, Helvetica, sans-serif;
+                        background: white;
+                        background: rgba(255,255,255,0.8);
+                        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+                        border-radius: 5px;
+                }
+                .info h4 {
+                        margin: 0 0 5px;
+                        color: #777;
+                }
 
-		.legend {
-			text-align: left;
-			line-height: 18px;
-			color: #555;
-		}
-		.legend i {
-			width: 18px;
-			height: 18px;
-			float: left;
-			margin-right: 8px;
-			opacity: 0.7;
-		}
-	</style>
-
-
-    
+                .legend {
+                        text-align: left;
+                        line-height: 18px;
+                        color: #555;
+                }
+                .legend i {
+                        width: 18px;
+                        height: 18px;
+                        float: left;
+                        margin-right: 8px;
+                        opacity: 0.7;
+                }
+        </style>    
     </head>
 <body>
-    
-    
     <div id="map"></div>
     <script>
-        var cmAttr = '<3 NSW Goverment'
-		var rapideyeURL = 'Imagery/RAPIDEYE.PERTH.2013:7:13.2013:7:13.{Type}.RdYlGn.255.-500.1001.{z}.{x}.{y}.png'
-		var LS8URL = 'Imagery/LS8.PERTH.2013:7:13.2013:7:13.{Type}.RdYlGn.255.-500.1001.{z}.{x}.{y}.png'
+        var cmAttr = 'Map tiles</a> by <a target="_top" href="http://stamen.com">Stamen Design</a>, under <a target="_top" href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a target="_top" href="http://openstreetmap.org">OpenStreetMap</a>, under <a target="_top" href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'
+        var cmUrl = 'http://appmapdata.environment.nsw.gov.au/arcgiswa/rest/services/Soil_Landscape/Sydney/MapServer/tile/{z}/{x}/{y}'
+        
+        //var map = L.map('map').setView([-33.8650,151.2094], 12);
+        
+        
+        var crs = new L.Proj.CRS('EPSG:4283',
+          '+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs',
+          {
+            resolutions: [8192, 4096, 2048 , 1024, 512, 256 , 128 , 64, 32, 16, 8 ,4 , 2 ,1], // 3 example zoom level resolutions
+          }
+        );
 
-	    
-        //var osm = L.tileLayer('http://{s}.tile.cloudmade.com/8ee2a50541944fb9bcedded5165f09d9/997/256/{z}/{x}/{y}.png', {maxZoom: 16,attribution: 'Imagery © <a href="http://mapbox.com">Mapbox</a>'});
-    	var osm = L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
-			maxZoom: 18,
-			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-			id: 'examples.map-i86knfo3'
-		})
+        var map = L.map('map', {
+          crs: crs,
+          continuousWorld: true,
+          worldCopyJump: false
+        }).setView([-33.8650,151.2094], 12);
+        
+        L.tileLayer(cmUrl, {attribution: cmAttr}).addTo(map);
 
-            
-        var baseLayers = {
-	"Base Layer":osm
-	};
-		
-		
-        var RapidEyeColor   = L.tileLayer(rapideyeURL, {Type: 'RGB', attribution: cmAttr});
-        var RapidEyeNDVI   = L.tileLayer(rapideyeURL, {Type: 'NDVI', attribution: cmAttr});
-        var RapidEyeNitrogen   = L.tileLayer(rapideyeURL, {Type: 'NITROGEN', attribution: cmAttr});
-        var RapidEyeRedEdge   = L.tileLayer(rapideyeURL, {Type: 'REDEDGE', attribution: cmAttr});
-        
-        var LS8NIDVI   = L.tileLayer(LS8URL, {Type: 'NDVI', attribution: cmAttr});
-        var LS8NITROGEN   = L.tileLayer(LS8URL, {Type: 'NITROGEN', attribution: cmAttr});
-        
-        var LS8TEMP   = L.tileLayer(LS8URL, {Type: 'THERMAL', attribution: cmAttr});
-        
-        
-                          
-        var overlayLayers = {
-            "RapidEye Perth 2011-04-02 Color": RapidEyeColor, 
-            "RapidEye Perth 2011-04-02 NDVI": RapidEyeNDVI,
-            "RapidEye Perth 2011-04-02 Nitrogen": RapidEyeNitrogen,
-            "RapidEye Perth 2011-04-02 Red Edge": RapidEyeRedEdge,
-          	"Landsat Perth NDVI": LS8NIDVI,
-          	"Landsat Perth Nitrogen": LS8NITROGEN,
-            "Landsat Perth Temperature": LS8TEMP
-        };
-
-        
-		var map = L.map('map',{layers: [RapidEyeColor]}).setView([-33.8650,151.2094], 10);
-		L.control.layers(baseLayers, overlayLayers).addTo(map);
-        
-        
-        
     </script>
 </body>
 </html>
-
