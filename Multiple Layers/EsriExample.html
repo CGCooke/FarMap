@@ -1,0 +1,39 @@
+<html>
+<head>
+  <meta charset=utf-8 />
+  <title>Showing an ArcGIS basemap</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+  <!-- Load Leaflet from CDN-->
+  <link rel="stylesheet" href="http://cdn.jsdelivr.net/leaflet/0.7.3/leaflet.css" />
+  <script src="http://cdn.jsdelivr.net/leaflet/0.7.3/leaflet.js"></script>
+
+  <!-- Load Esri Leaflet from CDN -->
+  <script src="http://cdn.jsdelivr.net/leaflet.esri/1.0.0/esri-leaflet.js"></script>
+
+  <style>
+    body { margin:0; padding:0; }
+    #map { position: absolute; top:0; bottom:0; right:0; left:0; }
+  </style>
+</head>
+<body>
+
+
+<div id="map"></div>
+
+<script>
+  var map = L.map('map').setView([-33, 151], 5);
+
+L.esri.tiledMapLayer({
+  url: 'http://appmapdata.environment.nsw.gov.au/arcgiswa/rest/services/Landuse/Landuse/MapServer',
+  //url: 'http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer',
+  maxZoom: 10
+}).addTo(map);
+
+
+
+
+</script>
+
+</body>
+</html>
