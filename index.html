@@ -45,10 +45,37 @@
 <body>
     <div id="map"></div>
     <script>
-        var cmAttr = 'Map tiles</a> by <a target="_top" href="http://stamen.com">Stamen Design</a>, under <a target="_top" href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a target="_top" href="http://openstreetmap.org">OpenStreetMap</a>, under <a target="_top" href="http://creativecommons.org/licenses/by-sa/3.0">CC BY SA</a>'
-        var cmUrl = 'Imagery/{z}.{y}.{x}.png'
-        var map = L.map('map').setView([-33.8650,151.2094], 10);
-        L.tileLayer(cmUrl, {attribution: cmAttr}).addTo(map);
+        var cmAttr = '<3 Hackathons'
+
+        var cmUrlPhoto = 'http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Imagery/MapServer/tile/{z}/{y}/{x}.jpeg'
+        var cmUrlHistorical = 'http://maps1.six.nsw.gov.au/arcgis/rest/services/sixmaps/sydney1943/MapServer/tile/{z}/{y}/{x}.jpeg'
+        var cmUrlBaseMap = 'http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/{z}/{y}/{x}.png'
+        var cmUrlLiDAR = 'Imagery/{z}.{y}.{x}.png'        
+
+        var photo   = L.tileLayer(cmUrlPhoto, {attribution: cmAttr})
+        var BaseMap     = L.tileLayer(cmUrlBaseMap, {attribution: cmAttr})
+        var Historical = L.tileLayer(cmUrlHistorical, {attribution: cmAttr})
+        var LiDAR =  L.tileLayer(cmUrlLiDAR, {attribution: cmAttr})
+
+        var map = L.map('map', {
+            center: [-33.8650,151.2094],
+            zoom: 10,
+            layers: [photo]
+        });
+
+        var baseLayers = {
+            "Satellite Photo": photo,
+            "Map": BaseMap,
+            "1943": Historical,
+            "LiDAR": LiDAR
+        };
+
+        L.control.layers(baseLayers).addTo(map);
+
+
+
+
+
     </script>
 </body>
 </html>

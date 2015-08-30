@@ -9,10 +9,12 @@ from flask import Flask,send_file
 from StringIO import StringIO
 from PIL import Image
 
+from globalmaptiles import GlobalMercator
+
 class tileRequest:
     def __init__(self, tileStr):
         ''' For more detail see README.md '''
-        z,x,y,extension = tileStr.split('.')
+        z,y,x,extension = tileStr.split('.')
         zoom,tx,ty = int(z),int(x),int(y)
         self.zoom = zoom
         self.tx = tx
@@ -34,17 +36,30 @@ def ImageryRequest(tileStr):
     y = tile.ty
     
     downloadedTileList = os.listdir('DownloadedTiles/')
-    tileFileName = str(z)+'.'+str(4*y)+'.'+str(4*x)+'.png'
+    tileFileName = str(z)+'.'+str(y)+'.'+str(x)+'.png'
     
-    #if tileFileName not in downloadedTileList:
-       #os.system('curl ' + 'http://maps.six.nsw.gov.au/arcgis/rest/services/public/NSW_Base_Map/MapServer/tile/'+str(z)+'/'+str(x)+'/'+str(y)+'.png' + ' > '+'DownloadedTiles/'+tileFileName+' --silent')
-    os.system('curl http://appmapdata.environment.nsw.gov.au/arcgiswa/rest/services/Soil_Landscape/Sydney/MapServer/tile/'+str(z)+'/'+str(4*y)+'/'+str(4*x)+' > '+'DownloadedTiles/'+tileFileName+' --silent')
+    print(x,y,z)    
+    tilesize = 256
+    tx = tile.tx
+    ty =tile.ty
+
+    zoom = tile.zoom
+    px = tx*tilesize 
+    py = ty*tilesize 
+    gm = GlobalMercator()
+
+    mx1,my1 = gm.PixelsToMeters(px, py, zoom)
+
+    mx2,my2 = gm.PixelsToMeters(px+tilesize, py+tilesize, zoom)
+    print(mx1,-my2,mx2,-my1)
+
+    os.system('rm Subset.TIF')
+    os.system('gdalwarp -q -t_srs epsg:3857 -te '+str(mx1)+' '+str(-my2)+' '+str(mx2)+' '+str(-my1)+' -r Lanczos -ts 256 256 Warped.TIF Subset.TIF')
     
-    #z,x,y = 11,1228,1883
-    #os.system('curl http://appmapdata.environment.nsw.gov.au/arcgiswa/rest/services/Landuse/Landuse/MapServer/'+str(z)+'/'+str(y)+'/'+str(x)+' > out.png')
 
     #Open the image
-    tileImage = Image.open('DownloadedTiles/'+tileFileName)
+    tileImage = Image.open('Subset.TIF')
+   
     #Turn the image into a string
     buffer_image = StringIO()
     tileImage.save(buffer_image, 'png')
@@ -52,17 +67,16 @@ def ImageryRequest(tileStr):
     #Send the string
     return(send_file(buffer_image, mimetype='image/png'))
   
-#z,y,x = 12,9853,12524
-#os.system('curl http://appmapdata.environment.nsw.gov.au/arcgiswa/rest/services/Soil_Landscape/Sydney/MapServer/tile/'+str(z)+'/'+str(y)+'/'+str(x)+' > out.png')
-#os.system('curl http://appmapdata.environment.nsw.gov.au/arcgiswa/rest/services/Soil_Landscape/Sydney/MapServer/tile/12/9853/12524 > out.png')
 
-
+os.system('gdalwarp -t_srs EPSG:3857 -q -r cubic Beach.TIF Warped.TIF')
 
 if __name__ == "__main__":
+    os.system('rm Subset.TIF')
     print('Server has started')
     os.system('rm -r DownloadedTiles')
     os.system('mkdir DownloadedTiles')
 
     app.run()
     
+
     
